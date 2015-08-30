@@ -185,7 +185,11 @@ class GenericProvider:
         Returns a Quality value obtained from the node's data
 
         """
-        (title, url) = self._get_title_and_url(item)  # @UnusedVariable
+        torrent_info = self._get_title_and_url(item)
+        if torrent_info.__len__() == 2:
+            (title, url) = torrent_info
+        else:
+            (title, url, seeders) = torrent_info
         quality = Quality.nameQuality(title)
         return quality
 
@@ -237,7 +241,12 @@ class GenericProvider:
 
         for item in itemList:
 
-            (title, url, seeders) = self._get_title_and_url(item)[::3]
+            seeders = -1
+            torrent_info = self._get_title_and_url(item)
+            if torrent_info.__len__() == 2:
+                (title, url) = torrent_info
+            else:
+                (title, url, seeders) = torrent_info
 
             # parse the file name
             try:
@@ -263,7 +272,9 @@ class GenericProvider:
                 logger.log(u"Ignoring result " + title + " because we don't want an episode that is " + Quality.qualityStrings[quality], logger.DEBUG)
                 continue
 
-            if seeders and seeders < sickbeard.MIN_SEEDERS:
+            if seeders == -1:
+                logger.log(u"{0} doesn't support filtering by minimum seeders at the moment".format(self.name))
+            elif seeders < sickbeard.MIN_SEEDERS:
                 logger.log(u"Ignoring result {0} it doesn't have enough seeders. (Has: {1}, Needs: {2})".format(title, seeders, sickbeard.MIN_SEEDERS))
                 continue
 
@@ -288,7 +299,12 @@ class GenericProvider:
 
         for item in itemList:
 
-            (title, url, seeders) = self._get_title_and_url(item)[::3]
+            seeders = -1
+            torrent_info = self._get_title_and_url(item)
+            if torrent_info.__len__() == 2:
+                (title, url) = torrent_info
+            else:
+                (title, url, seeders) = torrent_info
 
             quality = self.getQuality(item)
 
@@ -336,10 +352,11 @@ class GenericProvider:
                 logger.log(u"Ignoring result " + title + " because we don't want an episode that is " + Quality.qualityStrings[quality], logger.DEBUG)
                 continue
 
-            if seeders and seeders < sickbeard.MIN_SEEDERS:
+            if seeders == -1:
+                logger.log(u"{0} doesn't support filtering by minimum seeders at the moment".format(self.name))
+            elif seeders < sickbeard.MIN_SEEDERS:
                 logger.log(u"Ignoring result {0} it doesn't have enough seeders. (Has: {1}, Needs: {2})".format(title, seeders, sickbeard.MIN_SEEDERS))
                 continue
-
             logger.log(u"Found result " + title + " at " + url, logger.DEBUG)
 
             # make a result object
