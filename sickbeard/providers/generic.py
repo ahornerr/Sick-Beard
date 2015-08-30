@@ -214,7 +214,9 @@ class GenericProvider:
         if url:
             url = url.replace('&amp;', '&')
 
-        return (title, url)
+        seeders = helpers.get_xml_text(item.find('seeders'))
+
+        return (title, url, seeders)
 
     def findEpisode(self, episode, manualSearch=False):
 
@@ -237,7 +239,7 @@ class GenericProvider:
 
         for item in itemList:
 
-            (title, url) = self._get_title_and_url(item)
+            (title, url, seeders) = self._get_title_and_url(item)
 
             # parse the file name
             try:
@@ -284,7 +286,7 @@ class GenericProvider:
 
         for item in itemList:
 
-            (title, url) = self._get_title_and_url(item)
+            (title, url, seeders) = self._get_title_and_url(item)
 
             quality = self.getQuality(item)
 
