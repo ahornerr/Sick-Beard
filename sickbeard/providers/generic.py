@@ -214,9 +214,7 @@ class GenericProvider:
         if url:
             url = url.replace('&amp;', '&')
 
-        seeders = helpers.get_xml_text(item.find('seeders'))
-
-        return (title, url, seeders)
+        return (title, url)
 
     def findEpisode(self, episode, manualSearch=False):
 
@@ -239,7 +237,7 @@ class GenericProvider:
 
         for item in itemList:
 
-            (title, url, seeders) = self._get_title_and_url(item)
+            (title, url, seeders) = self._get_title_and_url(item)[::3]
 
             # parse the file name
             try:
@@ -265,6 +263,10 @@ class GenericProvider:
                 logger.log(u"Ignoring result " + title + " because we don't want an episode that is " + Quality.qualityStrings[quality], logger.DEBUG)
                 continue
 
+            if seeders and seeders < sickbeard.MIN_SEEDERS:
+                logger.log(u"Ignoring result {0} it doesn't have enough seeders. (Has: {1}, Needs: {2})".format(title, seeders, sickbeard.MIN_SEEDERS))
+                continue
+
             logger.log(u"Found result " + title + " at " + url, logger.DEBUG)
 
             result = self.getResult([episode])
@@ -286,7 +288,7 @@ class GenericProvider:
 
         for item in itemList:
 
-            (title, url, seeders) = self._get_title_and_url(item)
+            (title, url, seeders) = self._get_title_and_url(item)[::3]
 
             quality = self.getQuality(item)
 
@@ -332,6 +334,10 @@ class GenericProvider:
 
             if not wantEp:
                 logger.log(u"Ignoring result " + title + " because we don't want an episode that is " + Quality.qualityStrings[quality], logger.DEBUG)
+                continue
+
+            if seeders and seeders < sickbeard.MIN_SEEDERS:
+                logger.log(u"Ignoring result {0} it doesn't have enough seeders. (Has: {1}, Needs: {2})".format(title, seeders, sickbeard.MIN_SEEDERS))
                 continue
 
             logger.log(u"Found result " + title + " at " + url, logger.DEBUG)

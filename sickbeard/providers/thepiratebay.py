@@ -168,16 +168,16 @@ class ThePirateBayProvider(generic.TorrentProvider):
                 continue
             
             #Do not know why but Sick Beard skip release with a '_' in name
-            item = (torrent.group('title').replace('_', '.'), torrent.group('url'), torrent.group('seeders'))
+            item = (torrent.group('title').replace('_', '.'), torrent.group('url'), int(torrent.group('seeders')))
             results.append(item)
         return results
 
     ###################################################################################################
     def _get_title_and_url(self, item):
-        (title, url) = item
+        (title, url, seeders) = item
         if url:
             url = url.replace('&amp;','&')
-        return (title, url)
+        return (title, url, seeders)
 
     ###################################################################################################
     def getURL(self, url, headers=None):
@@ -265,7 +265,7 @@ class ThePirateBayCache(tvcache.TVCache):
 
     ###################################################################################################
     def _parseItem(self, item):
-        (title, url) = item
+        (title, url, seeders) = item
         if not title or not url:
             return
         logger.log(u"Adding item to cache: "+title, logger.DEBUG)
